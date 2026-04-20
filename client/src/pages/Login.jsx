@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, LogIn, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -13,18 +15,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 flex items-center justify-center p-4 font-sans pt-20">
       
       {/* Main Card Container */}
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         
         {/* Header Section */}
-        <div className="px-8 pt-10 pb-6 text-center">
-          <div className="mx-auto w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mb-5 shadow-sm border border-blue-100">
+        <div className="px-8 pt-10 pb-6 text-center bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="mx-auto w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-5 shadow-md border border-blue-200">
             <LogIn className="w-7 h-7 text-blue-600 ml-1" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome Back</h2>
-          <p className="text-gray-500 text-sm mt-2">Please enter your details to sign in.</p>
+          <p className="text-gray-600 text-sm mt-2">Please enter your details to sign in.</p>
         </div>
 
         {/* Form Section */}
@@ -115,7 +117,17 @@ export default function Login() {
         </div>
 
         {/* Footer Section */}
-       
+        <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 text-center">
+          <p className="text-gray-600 text-sm">
+            Don't have an account?{' '}
+            <button
+              onClick={() => navigate('/register')}
+              className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+            >
+              Sign Up here
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
