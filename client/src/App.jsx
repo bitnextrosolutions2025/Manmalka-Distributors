@@ -4,19 +4,26 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Navbar from './components/Navbar'
 import Order from './pages/Order'
+import ProtectedRoute from './components/ProtectedRoute'
 function App() {
 
   return (
     <>
-    <BrowserRouter>
-    <Navbar/>
-    <Routes>
-      <Route path='/' element={<Login/>}/>
-      <Route path='/register' element={<Register/>}/>
-      <Route path='/order' element={<Order/>}/>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path='/' element={
+            <ProtectedRoute>
+              <Order />
+            </ProtectedRoute>
+          } />
+          <Route path='/login' element={
+            <Login />
+            } />
+          <Route path='/register' element={<Register />} />
 
-    </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
 
     </>
   )

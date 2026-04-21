@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const OderSchema= new mongoose.Schema({
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     customerName:{
         type:String,
         require:true

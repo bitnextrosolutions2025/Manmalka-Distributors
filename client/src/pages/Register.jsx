@@ -67,7 +67,7 @@ export default function Register() {
       const data = await response.json();
 
       if (data.success) {
-        setSuccess('✓ Registration successful! and email is at user email with login details...');
+        setSuccess('✓ Registration successful! and email is at user email with login credential...');
         setFormData({
           username: '',
           email: '',
@@ -91,13 +91,13 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 flex items-center justify-center p-4 font-sans pt-20">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-100 flex items-center justify-center p-4 font-sans pt-20">
       
       {/* Main Card Container */}
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         
         {/* Header Section */}
-        <div className="px-8 pt-10 pb-6 text-center bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="px-8 pt-10 pb-6 text-center bg-linear-to-r from-blue-50 to-indigo-50">
           <div className="mx-auto w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-5 shadow-md border border-blue-200">
             <UserPlus className="w-7 h-7 text-blue-600" />
           </div>
