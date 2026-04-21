@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import Navbar from './components/Navbar'
 import Order from './pages/Order'
 import ProtectedRoute from './components/ProtectedRoute'
+import AllOrderShow from './pages/AllOrderShow'
 function App() {
 
   return (
@@ -21,7 +22,7 @@ function App() {
             <Login />
             } />
           <Route path='/register' element={<Register />} />
-
+          <Route path='/allorder' element={<AllOrderShow />} />
         </Routes>
       </BrowserRouter>
 

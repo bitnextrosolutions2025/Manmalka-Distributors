@@ -115,7 +115,7 @@ const Order = () => {
         orderItems: products
       };
       
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/order/add-order`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/orders/add-order`;
       const res = await fetch(url, {
         method: 'POST',
         headers: {

@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children }) {
     authService.checkAuth().then(setUseralldata);
   }, []);
 
-  if (useralldata === undefined) return <div>Loading...</div>;
+  if (useralldata === undefined) return <div >Loading...</div>;
 
   return useralldata ? children : <Navigate to="/login" replace />;
 }

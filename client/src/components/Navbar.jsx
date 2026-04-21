@@ -124,7 +124,7 @@ export default function Navbar() {
 
       {/* User Profile Modal */}
       {isModalOpen && isLoggedIn && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
             {/* Close Modal Button */}
             <button
@@ -158,6 +158,11 @@ export default function Navbar() {
             </div>
 
             {/* Logout Button */}
+            <button
+              className="w-full bg-blue-500 my-2 hover:bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
+            >
+              Check your Oder
+            </button>
             <button
               onClick={handleLogout}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
