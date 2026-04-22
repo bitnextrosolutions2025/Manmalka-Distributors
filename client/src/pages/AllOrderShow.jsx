@@ -7,6 +7,14 @@ export default function AllOrderShow() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    paymentstatus: '',
+    orderstatus: ''
+  });
+  const [updating, setUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState('');
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -37,6 +45,63 @@ export default function AllOrderShow() {
 
     fetchAllOrders();
   }, []);
+
+  const handleEditClick = (order) => {
+    setEditingOrder(order);
+    setEditFormData({
+      paymentstatus: order.paymentstatus,
+      orderstatus: order.orderstatus
+    });
+    setUpdateError('');
+    setShowEditModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowEditModal(false);
+    setEditingOrder(null);
+    setEditFormData({
+      paymentstatus: '',
+      orderstatus: ''
+    });
+    setUpdateError('');
+  };
+
+  const handleUpdateStatus = async () => {
+    try {
+      setUpdating(true);
+      setUpdateError('');
+
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/v2/orders/upatePaymnetAndDelivaryStatus`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: editingOrder._id,
+          paymentstatus: editFormData.paymentstatus,
+          orderstatus: editFormData.orderstatus
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        // Update the orders list with the updated order
+        setOrders(orders.map(order => 
+          order._id === editingOrder._id ? data.data : order
+        ));
+        handleModalClose();
+      } else {
+        setUpdateError(data.message || 'Failed to update order status');
+      }
+    } catch (err) {
+      setUpdateError(err.message || 'Failed to update order status');
+      console.error('Update order error:', err);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   // Loading State
   if (loading) {
@@ -131,7 +196,7 @@ export default function AllOrderShow() {
 
                   <div className="flex items-center gap-3 ml-4">
                     <div>
-                         <p className="text-xs text-gray-500 font-medium">Delivary process</p>
+                         <p className="text-xs text-gray-500 font-medium">Delivary Status</p>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         order.orderstatus === 'Delivered' ? 'bg-green-100 text-green-800' :
                         order.orderstatus === 'Out of Delivary' ? 'bg-blue-100 text-blue-800' :
@@ -151,6 +216,12 @@ export default function AllOrderShow() {
                         {order.paymentstatus}
                       </span>
                     </div>
+                    <button
+                      onClick={() => handleEditClick(order)}
+                      className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      Edit
+                    </button>
                   </div>
                 </div>
 
@@ -226,6 +297,92 @@ export default function AllOrderShow() {
             <p className="text-sm text-gray-600">
               <span className="font-semibold text-gray-900">{orders.length}</span> total orders
             </p>
+          </div>
+        )}
+
+        {/* Edit Status Modal */}
+        {showEditModal && editingOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Update Order Status</h2>
+                <button
+                  onClick={handleModalClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="px-6 py-4 space-y-4">
+                <div>
+                  <p className="text-xs text-gray-500 font-medium mb-2">Order ID</p>
+                  <p className="text-sm font-medium text-gray-900">{editingOrder._id?.slice(-8)}</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-500 font-medium mb-2">
+                    Delivery Status
+                  </label>
+                  <select
+                    value={editFormData.orderstatus}
+                    onChange={(e) => setEditFormData({...editFormData, orderstatus: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="Out of Delivary">Out of Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-500 font-medium mb-2">
+                    Payment Status
+                  </label>
+                  <select
+                    value={editFormData.paymentstatus}
+                    onChange={(e) => setEditFormData({...editFormData, paymentstatus: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Due">Due</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+
+                {updateError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-700">{updateError}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 bg-gray-50 border-t flex gap-3 justify-end">
+                <button
+                  onClick={handleModalClose}
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateStatus}
+                  disabled={updating}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {updating ? (
+                    <>
+                      <Loader className="h-4 w-4 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    'Update'
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

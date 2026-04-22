@@ -30,5 +30,5 @@ app.use('/api/v1/auth',AuthRoute);
 app.use('/api/v2/orders',OrderRoute);
 
 app.listen(process.env.PORT,()=>{
-   console.log(`Server Started on http://localhost:${process.env.PORT}`)
+   console.log(`Server Started on http://localhost:${process.env.PORT}`);
 })

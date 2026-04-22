@@ -171,9 +171,9 @@ AuthRoute.get('/getuser', verifyToken, (req, res) => {
     });
 });
 
-AuthRoute.post('/logout', async (req,res) => {
+AuthRoute.post('/logout', async (req, res) => {
     try {
-         const isProduction = process.env.NODE_ENV === 'production';
+        const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("authToken", {
             httpOnly: true,
             secure: isProduction,       // same as when you set it
@@ -194,4 +194,46 @@ AuthRoute.post('/logout', async (req,res) => {
 
     }
 })
+AuthRoute.post('/adminlogin', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Validation
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Username and password are required"
+            });
+        }
+        
+        if (username == process.env.USER && password == process.env.PASS) {
+            const token = jwt.sign(
+                {
+                    username: username,
+                    role: 'admin'
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: '1d' } // Token expires in 1 day
+            );
+            return res.status(200).json({ 
+                message: "Login Successful", 
+                token: token, 
+                status: true 
+            })
+        }
+        return res.status(401).json({ 
+            message: "Invalid credentials", 
+            status: false 
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ 
+            message: "Server error try again", 
+            status: false 
+        });
+    }
+
+})
+
+
 export default AuthRoute;

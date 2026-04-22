@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import logo from '../assets/logo.png'
-import { Menu, X, User } from 'lucide-react' // Imported User icon
+import { Menu, X, User, LogOut } from 'lucide-react' // Imported User and LogOut icons
 import { useUserData } from '../contexts/UserdataContext.jsx';
 import { authService } from '../services/authService.js';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false) // State for modal
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false) // State for admin modal
   const { useralldata, setUseralldata } = useUserData()
+  const navigate = useNavigate()
 
   useEffect(() => {
     console.log(useralldata)
@@ -22,13 +24,24 @@ export default function Navbar() {
     setIsModalOpen(!isModalOpen)
   }
 
+  const toggleAdminModal = () => {
+    setIsAdminModalOpen(!isAdminModalOpen)
+  }
+
   const handleLogout = async() => {
     await authService.logout();
     window.location.href = "/login";
   }
 
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminauth');
+    setIsAdminModalOpen(false);
+    navigate('/admin-login', { replace: true });
+  }
+
   // Boolean check to see if user data exists
   const isLoggedIn = !!useralldata;
+  const isAdminLoggedIn = !!localStorage.getItem('adminauth');
 
   return (
     <>
@@ -46,12 +59,12 @@ export default function Navbar() {
 
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex space-x-6 lg:space-x-8">
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
                 Home
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
-                About
-              </a>
+              </Link>
+              <Link to="/order" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                 Check Order
+              </Link>
               <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
                 Services
               </a>
@@ -61,8 +74,16 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Login / Profile Button */}
-            <div className="hidden md:block">
-              {isLoggedIn ? (
+            <div className="hidden md:flex gap-2">
+              {isAdminLoggedIn ? (
+                <button
+                  onClick={toggleAdminModal}
+                  className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 rounded-full transition duration-200 flex items-center justify-center"
+                  title="Admin"
+                >
+                  <User size={24} />
+                </button>
+              ) : isLoggedIn ? (
                 <button
                   onClick={toggleModal}
                   className="p-2 bg-gray-100 hover:bg-blue-50 text-gray-700 hover:text-blue-600 rounded-full transition duration-200 flex items-center justify-center"
@@ -70,9 +91,11 @@ export default function Navbar() {
                   <User size={24} />
                 </button>
               ) : (
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-200 text-sm lg:text-base">
-                  Login
-                </button>
+                <Link to="/login">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-200 text-sm lg:text-base">
+                    Login
+                  </button>
+                </Link>
               )}
             </div>
 
@@ -90,12 +113,12 @@ export default function Navbar() {
           {/* Mobile Navigation Menu */}
           {isOpen && (
             <div className="md:hidden pb-4 border-t border-gray-200">
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
+              <Link to="/" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
                 Home
-              </a>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
-                About
-              </a>
+              </Link>
+              <Link to='/order' className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
+                Check Order
+              </Link>
               <a href="#" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
                 Services
               </a>
@@ -158,15 +181,65 @@ export default function Navbar() {
             </div>
 
             {/* Logout Button */}
-            <button
+            <Link to='/order'><button
               className="w-full bg-blue-500 my-2 hover:bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
             >
               Check your Oder
-            </button>
+            </button></Link>
             <button
               onClick={handleLogout}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
             >
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Modal */}
+      {isAdminModalOpen && isAdminLoggedIn && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50 px-4 transition-opacity">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+            {/* Close Modal Button */}
+            <button
+              onClick={toggleAdminModal}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition duration-200"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="text-center mb-6 mt-2">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 text-purple-600 rounded-full mb-3">
+                <User size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
+            </div>
+
+            {/* Admin Info */}
+            <div className="space-y-4 mb-8 bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</p>
+                <p className="text-gray-900 font-medium flex items-center gap-2">
+                  <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+                  Admin Logged In
+                </p>
+              </div>
+            </div>
+
+            {/* Admin Navigation */}
+            <Link to='/allorder'><button
+              onClick={toggleAdminModal}
+              className="w-full bg-purple-500 my-2 hover:bg-purple-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
+            >
+              View All Orders
+            </button></Link>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleAdminLogout}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+            >
+              <LogOut size={18} />
               Logout
             </button>
           </div>
