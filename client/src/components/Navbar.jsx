@@ -28,11 +28,14 @@ export default function Navbar() {
     setIsAdminModalOpen(!isAdminModalOpen)
   }
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await authService.logout();
     window.location.href = "/login";
   }
-
+const handelOrderCheck=()=>{
+  setIsModalOpen(!isModalOpen)
+  navigate('/order')
+}
   const handleAdminLogout = () => {
     localStorage.removeItem('adminauth');
     setIsAdminModalOpen(false);
@@ -53,25 +56,29 @@ export default function Navbar() {
               <img
                 src={logo}
                 alt="Logo"
-                className="h-10 w-auto"
+                className="h-12 w-auto"
               />
             </div>
+            {isAdminLoggedIn ?
+              (
+                <div  className="hidden md:flex space-x-6 lg:space-x-8">
+                   <Link to="/allorder" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                  Home
+                </Link>
+                <Link to="/register" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                  Create User
+                </Link>
+                </div>
+              )
 
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex space-x-6 lg:space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
-                Home
-              </Link>
-              <Link to="/order" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
-                 Check Order
-              </Link>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
-                Services
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
-                Contact
-              </a>
-            </div>
+              : (<div className="hidden md:flex space-x-6 lg:space-x-8">
+                <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                  Home
+                </Link>
+                <Link to="/order" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                  Check Order
+                </Link>
+              </div>)}
 
             {/* Desktop Login / Profile Button */}
             <div className="hidden md:flex gap-2">
@@ -113,18 +120,24 @@ export default function Navbar() {
           {/* Mobile Navigation Menu */}
           {isOpen && (
             <div className="md:hidden pb-4 border-t border-gray-200">
+             {isAdminLoggedIn?
+             <div>
+              <Link to="/register" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
+                Create User
+              </Link>
+              <Link to='/allorder' className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
+                All Order
+              </Link>
+              </div>
+             : <div>
               <Link to="/" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
                 Home
               </Link>
               <Link to='/order' className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
                 Check Order
               </Link>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
-                Services
-              </a>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition duration-200 rounded">
-                Contact
-              </a>
+              </div>}
+
 
               {/* Mobile Login / Profile Button */}
               {isLoggedIn ? (
@@ -181,11 +194,12 @@ export default function Navbar() {
             </div>
 
             {/* Logout Button */}
-            <Link to='/order'><button
+            <button
               className="w-full bg-blue-500 my-2 hover:bg-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"
+              onClick={handelOrderCheck}
             >
               Check your Oder
-            </button></Link>
+            </button>
             <button
               onClick={handleLogout}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg transition duration-200"

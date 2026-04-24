@@ -10,7 +10,6 @@ import AdminProtectedRoute from './components/AdminProtectedRoute'
 import AllOrderShow from './pages/AllOrderShow'
 import UserAllOrder from './pages/UserAllOrder'
 function App() {
-
   return (
     <>
       <BrowserRouter>
@@ -24,7 +23,11 @@ function App() {
           <Route path='/login' element={
             <Login />
             } />
-          <Route path='/register' element={<Register />} />
+          <Route path='/register' element={
+            <AdminProtectedRoute>
+            <Register />
+            </AdminProtectedRoute>
+            } />
           <Route path='/admin-login' element={<AdminLogin />} />
           <Route path='/allorder' element={
             <AdminProtectedRoute>
@@ -38,9 +41,7 @@ function App() {
             } />
         </Routes>
       </BrowserRouter>
-
     </>
   )
 }
-
 export default App
