@@ -3,13 +3,15 @@ import logo from '../assets/logo.png'
 import { Menu, X, User, LogOut } from 'lucide-react' // Imported User and LogOut icons
 import { useUserData } from '../contexts/UserdataContext.jsx';
 import { authService } from '../services/authService.js';
+import locationAPI from '../services/locationService';
+import socketService from '../services/socketService';
 import { Link, useNavigate } from 'react-router';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false) // State for modal
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false) // State for admin modal
-  const { useralldata, setUseralldata } = useUserData()
+  const { useralldata, setUseralldata ,setIsLoggedIn,setUser} = useUserData()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -29,9 +31,52 @@ export default function Navbar() {
   }
 
   const handleLogout = async () => {
-    await authService.logout();
+  try {
+    // Step 1: Call your auth API logout
+    
+
+    // Step 2: Mark location as offline in database
+    try {
+      await locationAPI.logout();
+    } catch (err) {
+      console.error('Location logout error (non-critical):', err);
+      // Continue even if this fails
+    }
+
+    // Step 3: Notify socket server and disconnect
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user?.userId) {
+        socketService.logout(user.userId);
+        socketService.disconnect();
+      }
+    } catch (err) {
+      console.error('Socket logout error (non-critical):', err);
+      // Continue even if this fails
+    }
+await authService.logout();
+    // Step 4: Clear user context
+    setUser(null);
+    setIsLoggedIn(false);
+
+    // Step 5: Clear localStorage
+    localStorage.removeItem('user')
+
+    // Step 6: Navigate to login
+    window.location.href = "/login";
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Show error to user but still clear data
+    alert('Error during logout: ' + error.message);
+    
+    // Force clear data even on error
+    setUser(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('user');
+    // navigate('/login');
     window.location.href = "/login";
   }
+};
 const handelOrderCheck=()=>{
   setIsModalOpen(!isModalOpen)
   navigate('/order')

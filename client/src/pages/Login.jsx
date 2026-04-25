@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, LogIn, ArrowRight, AlertCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService.js';
-
+import { useUserData } from '../contexts/UserdataContext.jsx';
 export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
@@ -11,7 +11,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+  const {setUser, setIsLoggedIn}=useUserData()
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -36,6 +36,18 @@ export default function Login() {
       if (response.success) {
         setSuccess('Login successful! Redirecting...');
         // Backend has set HttpOnly cookie automatically
+        const userData = response.user; 
+         setUser({
+          userId: userData.id || userData._id,
+          username: userData.username,
+          email: userData.email,
+        });
+        setIsLoggedIn(true);
+        localStorage.setItem('user', JSON.stringify({
+          userId: userData.id || userData._id,
+          username: userData.username,
+          email: userData.email,
+        }));
         
         // Redirect to dashboard/home after 1 second
         setTimeout(() => {

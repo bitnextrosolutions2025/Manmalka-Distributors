@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -9,10 +9,24 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminProtectedRoute from './components/AdminProtectedRoute'
 import AllOrderShow from './pages/AllOrderShow'
 import UserAllOrder from './pages/UserAllOrder'
+import { useUserData } from './contexts/UserdataContext'
+import LocationTracker from './components/LocationTracker';
+import AdminDashboard from './pages/AdminDashboard';
+// import UserDataContext from './contexts/UserdataContext'
 function App() {
+  const { useralldata } = useUserData();
   return (
     <>
       <BrowserRouter>
+        <LocationTracker
+          isLoggedIn={useralldata}
+          userId={useralldata?.userId}
+          onPermissionDenied={() => {
+            // Optional: Show a notification that location tracking is disabled
+            console.warn('User denied location permission');
+          }}
+        />
+
         <Navbar />
         <Routes>
           <Route path='/' element={
@@ -22,12 +36,12 @@ function App() {
           } />
           <Route path='/login' element={
             <Login />
-            } />
+          } />
           <Route path='/register' element={
             <AdminProtectedRoute>
-            <Register />
+              <Register />
             </AdminProtectedRoute>
-            } />
+          } />
           <Route path='/admin-login' element={<AdminLogin />} />
           <Route path='/allorder' element={
             <AdminProtectedRoute>
@@ -36,9 +50,13 @@ function App() {
           } />
           <Route path='/order' element={
             <ProtectedRoute>
-            <UserAllOrder />
+              <UserAllOrder />
             </ProtectedRoute>
-            } />
+          } /> 
+          <Route
+            path="/dashboard"
+            element={ <AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>}
+          />
         </Routes>
       </BrowserRouter>
     </>
