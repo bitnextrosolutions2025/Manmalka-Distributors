@@ -113,6 +113,9 @@ const handelOrderCheck=()=>{
                 <Link to="/register" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
                   Create User
                 </Link>
+                <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 text-sm lg:text-base">
+                  Location
+                </Link>
                 </div>
               )
 
