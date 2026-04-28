@@ -71,7 +71,7 @@ export default function UserLoginTracker() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div className="flex justify-center items-center h-screen bg-linear-to-br from-blue-50 to-indigo-50">
         <div className="text-center">
           <div className="animate-spin inline-block w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
           <p className="mt-4 text-gray-600 font-medium">Loading login records...</p>
@@ -202,7 +202,7 @@ export default function UserLoginTracker() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                <thead className="bg-linear-to-r from-blue-600 to-blue-700 text-white">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Username</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Email</th>

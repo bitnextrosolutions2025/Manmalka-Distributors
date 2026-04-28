@@ -131,7 +131,7 @@ export const AdminLiveMap = () => {
 
         const markerColor = location.status === 'online' ? '#22c55e' : '#9ca3af';
         const popupContent = `
-            <div class="p-1 min-w-[150px]">
+            <div class="p-1 min-w-37.5">
                 <div class="flex items-center gap-2 mb-1">
                     <div class="w-2.5 h-2.5 rounded-full ${location.status === 'online' ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}"></div>
                     <h3 class="font-bold text-gray-800 text-sm m-0">${location.user.username}</h3>
@@ -238,7 +238,7 @@ return (
 
             {/* Loading Overlay */}
             {loading && (
-                <div className="absolute inset-0 z-[500] flex flex-col items-center justify-center bg-gray-50/90 backdrop-blur-sm">
+                <div className="absolute inset-0 z-500 flex flex-col items-center justify-center bg-gray-50/90 backdrop-blur-sm">
                     <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
                     <p className="text-gray-600 font-medium animate-pulse">Initializing map...</p>
                 </div>
@@ -270,7 +270,7 @@ return (
 
             {/* Map Legend */}
             {!loading && (
-                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 p-4 min-w-[160px] z-[400]">
+                <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 p-4 min-w-40 z-400">
                     <h3 className="font-bold text-gray-800 text-sm mb-3 uppercase tracking-wider">Map Legend</h3>
                     <div className="space-y-3">
                         <div className="flex items-center gap-3">
