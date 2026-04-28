@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import LoginTime from "../models/LoginTime.js";
 import sendemail from "../middlewares/sendmail.js";
 import verifyToken from "../middlewares/verifyToken.js";
 
@@ -133,6 +134,23 @@ AuthRoute.post('/login', async (req, res) => {
             { expiresIn: '7d' } // Token expires in 7 days
         );
 
+        // Save login time to database
+        try {
+            const loginRecord = new LoginTime({
+                userId: user._id,
+                username: user.username,
+                email: user.email,
+                loginTime: new Date(),
+                ipAddress: req.ip || req.connection.remoteAddress,
+                userAgent: req.get('user-agent')
+            });
+            await loginRecord.save();
+            console.log("✅ Login record saved:", loginRecord._id);
+        } catch (loginError) {
+            console.error("❌ Error saving login record:", loginError);
+            // Continue even if login record fails to save
+        }
+
         // Set HttpOnly cookie on frontend (secure, can't be accessed by JavaScript)
         const isProduction = process.env.NODE_ENV === 'production';
         res.cookie('authToken', token, {
@@ -173,6 +191,31 @@ AuthRoute.get('/getuser', verifyToken, (req, res) => {
 
 AuthRoute.post('/logout', async (req, res) => {
     try {
+        const { userId } = req.body; // Frontend should send userId
+        console.log(userId)
+        // Update logout time for the most recent unclosed session
+        if (userId) {
+            try {
+                const loginRecord = await LoginTime.findOne({
+                    userId: userId,
+                    logoutTime: null // Find the most recent login without logout
+                }).sort({ loginTime: -1 });
+
+                if (loginRecord) {
+                    const logoutTime = new Date();
+                    const sessionDuration = logoutTime - loginRecord.loginTime; // Duration in milliseconds
+
+                    loginRecord.logoutTime = logoutTime;
+                    loginRecord.sessionDuration = sessionDuration;
+                    await loginRecord.save();
+                    console.log("✅ Logout record updated:", loginRecord._id);
+                }
+            } catch (logoutError) {
+                console.error("❌ Error updating logout record:", logoutError);
+                // Continue even if logout record fails to update
+            }
+        }
+
         const isProduction = process.env.NODE_ENV === 'production';
         res.clearCookie("authToken", {
             httpOnly: true,
@@ -185,13 +228,12 @@ AuthRoute.post('/logout', async (req, res) => {
             message: "Logged out successfully"
         });
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("Logout error:", error);
         return res.status(500).json({
             success: false,
-            message: "Server error during login. Please try again.",
-            error: "LOGIN_ERROR"
+            message: "Server error during logout. Please try again.",
+            error: "LOGOUT_ERROR"
         });
-
     }
 })
 AuthRoute.post('/adminlogin', async (req, res) => {
@@ -234,6 +276,97 @@ AuthRoute.post('/adminlogin', async (req, res) => {
     }
 
 })
+
+// Get all login/logout records for admin dashboard
+AuthRoute.get('/login-records', async (req, res) => {
+    try {
+        const records = await LoginTime.find()
+            .populate('userId', 'username email')
+            .sort({ loginTime: -1 })
+            .limit(1000); // Limit to prevent overwhelming the response
+
+        return res.status(200).json({
+            success: true,
+            message: "Login records retrieved successfully",
+            records: records,
+            totalRecords: records.length
+        });
+    } catch (error) {
+        console.error("Error fetching login records:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching records",
+            error: "FETCH_ERROR"
+        });
+    }
+});
+
+// Get login records for specific user
+AuthRoute.get('/login-records/:userId', verifyToken, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const records = await LoginTime.find({ userId })
+            .sort({ loginTime: -1 })
+            .limit(100);
+
+        return res.status(200).json({
+            success: true,
+            message: "User login records retrieved successfully",
+            records: records,
+            totalRecords: records.length
+        });
+    } catch (error) {
+        console.error("Error fetching user login records:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching records",
+            error: "FETCH_ERROR"
+        });
+    }
+});
+
+// Get login statistics (today, this week, etc.)
+AuthRoute.get('/login-stats', async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+
+        const todayCount = await LoginTime.countDocuments({ 
+            loginTime: { $gte: today } 
+        });
+
+        const weekCount = await LoginTime.countDocuments({ 
+            loginTime: { $gte: weekAgo } 
+        });
+
+        const totalCount = await LoginTime.countDocuments();
+
+        const uniqueUsersToday = await LoginTime.distinct('userId', { 
+            loginTime: { $gte: today } 
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Login statistics retrieved successfully",
+            stats: {
+                todayLogins: todayCount,
+                weekLogins: weekCount,
+                totalLogins: totalCount,
+                uniqueUsersToday: uniqueUsersToday.length
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching login stats:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching statistics",
+            error: "STATS_ERROR"
+        });
+    }
+});
 
 
 export default AuthRoute;

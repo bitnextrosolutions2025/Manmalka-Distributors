@@ -72,9 +72,12 @@ export const authService = {
   },
 
   // Logout user (clear stored data, backend clears cookie)
-  logout: async () => {
+  logout: async (userid) => {
   try {
-    await apiClient.post('/auth/logout'); // clears cookie on server
+   
+    await apiClient.post('/auth/logout', { 
+      userId: userid
+    }); // clears cookie on server
   } catch (err) {
     console.error("Logout failed", err);
   }

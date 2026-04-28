@@ -54,7 +54,9 @@ export default function Navbar() {
       console.error('Socket logout error (non-critical):', err);
       // Continue even if this fails
     }
-await authService.logout();
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user.userId)
+await authService.logout(user.userId);
     // Step 4: Clear user context
     setUser(null);
     setIsLoggedIn(false);
