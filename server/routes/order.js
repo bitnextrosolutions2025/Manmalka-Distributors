@@ -87,5 +87,4 @@ OrderRoute.get('/getuserorder', verifyToken, async (req, res) => {
         return res.status(500).json({ message: "Server error try again", status: false });
     }
 })
-
 export default OrderRoute;
