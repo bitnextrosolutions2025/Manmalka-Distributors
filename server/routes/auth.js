@@ -220,7 +220,7 @@ AuthRoute.post('/logout', async (req, res) => {
         res.clearCookie("authToken", {
             httpOnly: true,
             secure: isProduction,       // same as when you set it
-            sameSite: "strict",
+            sameSite: isProduction ? 'None' : 'Strict',
             path: '/'   // must match original config
         });
 
