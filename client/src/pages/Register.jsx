@@ -49,7 +49,7 @@ export default function Register() {
     setLoading(true);
     setError('');
     setSuccess('');
-     const url=`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/register`
+     const url=`${import.meta.env.VITE_BACKEND2_URL}/api/v1/auth/register`
     try {
       const response = await fetch(url, {
         method: 'POST',
