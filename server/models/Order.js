@@ -8,15 +8,18 @@ const OderSchema = new mongoose.Schema({
     },
     customerName: {
         type: String,
-        require: true
+        require: true,
+        trim: true,
     },
     customerShop: {
         type: String,
-        require: true
+        require: true,
+        trim: true,
     },
     customerAddress: {
         type: String,
-        require: true
+        require: true,
+        trim: true,
     },
     orderItems: {
         type: Array,
