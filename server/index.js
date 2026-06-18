@@ -25,7 +25,7 @@ const io = new Server(httpServer, {
 })
 
 // CORS configuration for production-ready setup
-const corsOptions = {
+const corsOptions = {   
     origin: process.env.FRONTEND_URL,
     credentials: true, // Allow credentials (cookies, authorization headers)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
